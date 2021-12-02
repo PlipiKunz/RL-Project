@@ -30,8 +30,7 @@ class BounceEnv(gym.Env):
         self.paddle_update(action)
         done = self.ball_update()
         
-        # reward = 10 * self.bounces
-        reward = 0
+        reward = 10 * self.bounces
         # if the ball is between the paddle height wise
         if(self.paddle_pos[1] <= self.ball_pos[1]) and (self.ball_pos[1] <= self.paddle_pos[1] + self.paddle_height):
             reward += 5
@@ -161,4 +160,4 @@ class BounceEnv(gym.Env):
             screen = cv2.rectangle(screen, self.paddle_pos, (self.paddle_pos[0] + self.paddle_width, self.paddle_pos[1] + self.paddle_height), (0,255,0),-1)
             
             cv2.imshow("bounce", screen)
-            cv2.waitKey(1)
+            cv2.waitKey(5)

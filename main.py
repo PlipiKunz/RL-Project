@@ -1,5 +1,5 @@
 import agent
-import environment_methods
+import environment_methods 
 
 import matplotlib.pyplot as plt
 import time
@@ -26,7 +26,9 @@ for i in range(20_000):
     timesteps = agent.total_timesteps
     start_time = time.time()
 
-    score , info = environment_methods.play_episode(name, env, agent, False, i)
+    environment_methods.play_episode(name, env, agent, False, i, "human", True)
+    score , info = environment_methods.play_episode(name, env, agent, False, i, "computer", False)
+    
     scores.append(score)
 
     if score > max_score:
@@ -48,7 +50,7 @@ for i in range(20_000):
     duration.append(agent.total_timesteps - timesteps)
     bounces.append(info)
     
-    if (i%100==0) or (i >= 150 and i%10==0) :
+    if (i%50==0) or (i >= 150 and i%10==0) :
         plt.plot(np.arange(0,i+1,1),score_list)
         plt.title("Scores")
         plt.xlabel("Iteration")
@@ -70,9 +72,9 @@ for i in range(20_000):
         plt.savefig(fname =  f"plots/bounces/bounces_at_iteration_{i}.png")
         plt.close()
 
-    if i%100==0 and i!=0:
+    if i%50==0 and i!=0:
         avg_scores.append(sum(scores)/len(scores))
-        plt.plot(np.arange(0,i+1,100), avg_scores)
+        plt.plot(np.arange(0,i+1,50), avg_scores)
         plt.title("Average Scores")
         plt.xlabel("Iteration")
         plt.ylabel("Average Score")
