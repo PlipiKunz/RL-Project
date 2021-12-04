@@ -53,6 +53,10 @@ class Agent():
         else:
             return True
 
+
+    def update_memory(self,next_frame, next_frames_reward, next_action, next_frame_terminal):
+        self.memory.add_experience(next_frame, next_frames_reward, next_action, next_frame_terminal)
+
     def learn(self,debug = False):
         size = 32
         """we want the output[a] to be R_(t+1) + Qmax_(t+1)."""

@@ -4,7 +4,8 @@ import environment
 import numpy as np
 
 import keyboard
-import time
+
+list_of_actions = []
 
 def initialize_new_game(name, env, agent):
     """We don't want an agents past game influencing its new game, so we add in some dummy data to initialize"""
@@ -45,7 +46,11 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True):
             print('\nWeights saved!')
 
     #3: Take action
-    next_frame, next_frames_reward, next_frame_terminal, info = env.step(agent.memory.actions[-1])
+    prev_action = 0
+    if len(list_of_actions) > 0:
+        prev_action = list_of_actions[-1][2]
+        
+    next_frame, next_frames_reward, next_frame_terminal, info = env.step(prev_action)
     
     #4: Get next state
     new_state = next_frame
@@ -53,27 +58,32 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True):
     #5: Get next action, using next state
     if mode == "computer":
         next_action = agent.get_action(new_state)
+        next_frames_reward = 1
     else:
         next_action = get_user_action(env)
 
-    #6: If game is over, return the score
+    #6: If game is over,learn and then return the score
     if next_frame_terminal:
         if learn:
-            agent.memory.add_experience(next_frame, next_frames_reward, next_action, next_frame_terminal)
+            list_of_actions.append([next_frame, next_frames_reward, next_action, next_frame_terminal])
+            
+            for mem in list_of_actions:
+                agent.memory.add_experience(mem[0] , mem[1] , mem[2], mem[3])
+            
+                # 9: If the threshold memory is satisfied, make the agent learn from memory
+                if len(agent.memory.frames) > agent.starting_mem_len:
+                        agent.learn(debug)
+            
+            list_of_actions.clear()
         return (score + next_frames_reward),True , info  #(next_frames_reward),True
-
+    
     #7: Now we add the next experience to memory
     if learn:
-        agent.memory.add_experience(next_frame, next_frames_reward, next_action, next_frame_terminal)
+        list_of_actions.append([next_frame, next_frames_reward, next_action, next_frame_terminal])
 
     #8: If we are trying to debug this then render
     if debug:
         env.render()
-
-    # 9: If the threshold memory is satisfied, make the agent learn from memory
-    if len(agent.memory.frames) > agent.starting_mem_len:
-        if learn:
-            agent.learn(debug)
 
     return (score + next_frames_reward),False, info  #(next_frames_reward), False
 
