@@ -22,12 +22,16 @@ max_bounces = -1
 
 env.reset()
 env.render()
-for i in range(20_000):
+
+for i in range(1_000):
+    print('\nEpisode: ' + str(i))
+    environment_methods.play_episode(name, env, agent, False, i, "human", False, True)
+
+for i in range(1_000):
     timesteps = agent.total_timesteps
     start_time = time.time()
 
-    environment_methods.play_episode(name, env, agent, False, i, "human", True)
-    score , info = environment_methods.play_episode(name, env, agent, False, i, "computer", False)
+    score , info = environment_methods.play_episode(name, env, agent, False, i, "computer",True, False)
     
     scores.append(score)
 

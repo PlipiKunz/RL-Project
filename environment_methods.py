@@ -36,7 +36,7 @@ def get_user_action(env):
     
     return 1
 
-def take_step(name, env, agent, score, debug, mode = "computer", learn = True):
+def take_step(name, env, agent, score, debug, mode = "computer", learn = True, remember = True):
     
     #1 and 2: Update timesteps and save weights
     if learn:
@@ -58,28 +58,29 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True):
     #5: Get next action, using next state
     if mode == "computer":
         next_action = agent.get_action(new_state)
-        next_frames_reward = 1
     else:
         next_action = get_user_action(env)
+        next_frames_reward = 1
 
     #6: If game is over,learn and then return the score
     if next_frame_terminal:
-        if learn:
+        if remember:
             list_of_actions.append([next_frame, next_frames_reward, next_action, next_frame_terminal])
             
             for mem in list_of_actions:
                 agent.memory.add_experience(mem[0] , mem[1] , mem[2], mem[3])
             
-                # 9: If the threshold memory is satisfied, make the agent learn from memory
-                if len(agent.memory.frames) > agent.starting_mem_len:
-                        agent.learn(debug)
-            
             list_of_actions.clear()
+            
         return (score + next_frames_reward),True , info  #(next_frames_reward),True
     
     #7: Now we add the next experience to memory
-    if learn:
+    if remember:
         list_of_actions.append([next_frame, next_frames_reward, next_action, next_frame_terminal])
+
+    # 9: If the threshold memory is satisfied, make the agent learn from memory
+    if len(agent.memory.frames) > agent.starting_mem_len and learn:
+            agent.learn(debug)
 
     #8: If we are trying to debug this then render
     if debug:
@@ -87,13 +88,13 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True):
 
     return (score + next_frames_reward),False, info  #(next_frames_reward), False
 
-def play_episode(name, env, agent, debug = False, iterations = 0, mode = "computer", learn = True):
+def play_episode(name, env, agent, debug = False, iterations = 0, mode = "computer", learn = True, remember = True):
     initialize_new_game(name, env, agent)
     done = False
     score = 0
     info = ""
     while True:
-        score,done,info  = take_step(name,env,agent,score, debug, mode, learn)
+        score,done,info  = take_step(name,env,agent,score, debug, mode, learn, remember)
         
         if done:
             break
