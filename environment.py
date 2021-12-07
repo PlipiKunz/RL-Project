@@ -10,9 +10,9 @@ class BounceEnv(gym.Env):
         super().__init__()
             
         # There are 3 actions
-        # 0 Move the paddle left
+        # 0 Move the paddle down
         # 1 Dont move the paddle 
-        # 2 Move the paddle right
+        # 2 Move the paddle up
         self.action_space = spaces.Discrete(3)
         
         # The observations
@@ -112,6 +112,16 @@ class BounceEnv(gym.Env):
             if(self.paddle_pos[1] <= self.ball_pos[1]) and (self.ball_pos[1] <= self.paddle_pos[1] + self.paddle_height):
                 return True
         return False
+    
+    
+    def paddle_ball_relation(self):
+        paddle_center_y = self.paddle_pos[1] + (self.paddle_height//2)
+        
+        if paddle_center_y >= self.ball_pos[1]:
+            return 0
+        elif paddle_center_y <= self.ball_pos[1]:
+            return 2
+        return 1
     
     def reset(self):
         self.screen_width = 75

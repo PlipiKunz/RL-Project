@@ -29,6 +29,7 @@ def make_env(name, agent):
 
 def get_user_action(env):
     env.render()
+    # return env.paddle_ball_relation()
     if keyboard.is_pressed('up'):
         return 0
     elif keyboard.is_pressed('down'):
@@ -61,6 +62,10 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True, r
     else:
         next_action = get_user_action(env)
         next_frames_reward = 1
+        
+        # # if the game was just beat make the reward huge
+        # if info >= env.max_bounce:
+        #     next_frames_reward = 100_000
 
     #6: If game is over,learn and then return the score
     if next_frame_terminal:
