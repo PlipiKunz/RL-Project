@@ -28,14 +28,14 @@ def make_env(name, agent):
     return env
 
 def get_user_action(env):
-    env.render()
-    # return env.paddle_ball_relation()
-    if keyboard.is_pressed('up'):
-        return 0
-    elif keyboard.is_pressed('down'):
-        return 2
+    # env.render()
+    return env.paddle_ball_relation()
     
-    return 1
+    # if keyboard.is_pressed('up'):
+    #     return 0
+    # elif keyboard.is_pressed('down'):
+    #     return 2
+    # return 1
 
 def take_step(name, env, agent, score, debug, mode = "computer", learn = True, remember = True):
     
