@@ -21,13 +21,13 @@ max_score = -1
 max_bounces = -1
 
 env.reset()
-env.render()
+# env.render()
 
-for i in range(1_000):
+for i in range(10_001):
     print('\nEpisode: ' + str(i))
     environment_methods.play_episode(name, env, agent, False, i, "human", False, True)
 
-for i in range(1_000):
+for i in range(10_001):
     timesteps = agent.total_timesteps
     start_time = time.time()
 
@@ -54,7 +54,7 @@ for i in range(1_000):
     duration.append(agent.total_timesteps - timesteps)
     bounces.append(info)
     
-    if (i%50==0) or (i >= 150 and i%10==0) :
+    if (i%50==0) and i!=0:
         plt.plot(np.arange(0,i+1,1),score_list)
         plt.title("Scores")
         plt.xlabel("Iteration")
@@ -84,4 +84,3 @@ for i in range(1_000):
         plt.ylabel("Average Score")
         plt.savefig(fname =  f"plots/average_scores/ave_scores_at_itteration_{i}.png")
         plt.close()
-

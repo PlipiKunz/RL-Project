@@ -85,6 +85,7 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True, r
 
     # 9: If the threshold memory is satisfied, make the agent learn from memory
     if len(agent.memory.frames) > agent.starting_mem_len and learn:
+            
             agent.learn(debug)
 
     #8: If we are trying to debug this then render
