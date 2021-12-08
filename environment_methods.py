@@ -1,11 +1,15 @@
 
 import gym
+from gym.core import Env
 import environment
 import numpy as np
 
+import globalVars
 import keyboard
 
 list_of_actions = []
+
+
 
 def initialize_new_game(name, env, agent):
     """We don't want an agents past game influencing its new game, so we add in some dummy data to initialize"""
@@ -27,15 +31,38 @@ def make_env(name, agent):
         
     return env
 
-def get_user_action(env):
-    # env.render()
-    return env.paddle_ball_relation()
+def good_actor_random(env):
+    if np.random.random() < .1:
+        return np.random.randint(low=0, high=3)
+    else:
+        return env.paddle_ball_relation()
     
-    # if keyboard.is_pressed('up'):
-    #     return 0
-    # elif keyboard.is_pressed('down'):
-    #     return 2
-    # return 1
+def good_actor_epsilon(env):
+    
+    if np.random.rand() < globalVars.ga_epsilon:
+        act =  np.random.randint(low=0, high=3)
+    else:
+        act =  env.paddle_ball_relation()
+        
+    if globalVars.ga_epsilon > globalVars.ga_epsilon_min:
+            globalVars.ga_epsilon -=globalVars.ga_epsilon_decay
+        
+    return act
+    
+def get_user_action():
+    if keyboard.is_pressed('up'):
+        return 0
+    elif keyboard.is_pressed('down'):
+        return 2
+    return 1
+
+def get_actor_action(env):
+    # env.render()
+    
+    # return good_actor_random(env)
+    return good_actor_epsilon(env)
+    # return good_actor_random(env)
+    
 
 def take_step(name, env, agent, score, debug, mode = "computer", learn = True, remember = True):
     
@@ -60,12 +87,7 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True, r
     if mode == "computer":
         next_action = agent.get_action(new_state)
     else:
-        next_action = get_user_action(env)
-        # next_frames_reward = 1
-        
-        # # if the game was just beat make the reward huge
-        # if info >= env.max_bounce:
-        #     next_frames_reward = 100_000
+        next_action = get_actor_action(env)
 
     #6: If game is over,learn and then return the score
     if next_frame_terminal:
@@ -85,7 +107,7 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True, r
 
     # 9: If the threshold memory is satisfied, make the agent learn from memory
     if len(agent.memory.frames) > agent.starting_mem_len and learn:
-            
+
             agent.learn(debug)
 
     #8: If we are trying to debug this then render
@@ -99,6 +121,8 @@ def play_episode(name, env, agent, debug = False, iterations = 0, mode = "comput
     done = False
     score = 0
     info = ""
+    
+    print(globalVars.ga_epsilon)
     while True:
         score,done,info  = take_step(name,env,agent,score, debug, mode, learn, remember)
         
