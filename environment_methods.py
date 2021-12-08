@@ -61,7 +61,7 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True, r
         next_action = agent.get_action(new_state)
     else:
         next_action = get_user_action(env)
-        next_frames_reward = 1
+        # next_frames_reward = 1
         
         # # if the game was just beat make the reward huge
         # if info >= env.max_bounce:
