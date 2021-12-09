@@ -38,14 +38,10 @@ def good_actor_random(env):
         return env.paddle_ball_relation()
     
 def good_actor_epsilon(env):
-    
-    if np.random.rand() < globalVars.ga_epsilon:
+    if globalVars.be_random:
         act =  np.random.randint(low=0, high=3)
     else:
         act =  env.paddle_ball_relation()
-        
-    if globalVars.ga_epsilon > globalVars.ga_epsilon_min:
-            globalVars.ga_epsilon -=globalVars.ga_epsilon_decay
         
     return act
     
@@ -122,6 +118,15 @@ def play_episode(name, env, agent, debug = False, iterations = 0, mode = "comput
     score = 0
     info = ""
     
+    if np.random.rand() < globalVars.ga_epsilon:
+        globalVars.be_random = True
+    else:
+        globalVars.be_random = False
+        
+    if globalVars.ga_epsilon > globalVars.ga_epsilon_min:
+            globalVars.ga_epsilon -=globalVars.ga_epsilon_decay
+            
+            
     print(globalVars.ga_epsilon)
     while True:
         score,done,info  = take_step(name,env,agent,score, debug, mode, learn, remember)

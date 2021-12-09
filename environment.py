@@ -30,7 +30,7 @@ class BounceEnv(gym.Env):
         self.paddle_update(action)
         done = self.ball_update()
         
-        reward = 10 * self.bounces
+        reward = 0 #10 * self.bounces
         # if the ball is between the paddle height wise
         if(self.paddle_pos[1] <= self.ball_pos[1]) and (self.ball_pos[1] <= self.paddle_pos[1] + self.paddle_height):
             reward += 5
