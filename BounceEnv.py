@@ -3,12 +3,14 @@ from gym import spaces
 
 import cv2
 import numpy as np
+from PIL import Image
 
 
 class BounceEnv(gym.Env):
     def __init__(self) -> None:
         super().__init__()
             
+        # gym.make()
         # There are 3 actions
         # 0 Move the paddle down
         # 1 Dont move the paddle 
@@ -146,6 +148,8 @@ class BounceEnv(gym.Env):
         self.max_bounce = 10
         self.bounces = 0
         
+        self.image_array = []
+        
         self.set_obs()
         
         return self.observation_space
@@ -154,20 +158,43 @@ class BounceEnv(gym.Env):
         self.observation_space = np.array((self.ball_pos[0],self.ball_pos[1], self.ball_vel[0],  self.ball_vel[1],self.paddle_pos[1]))
         
     def render(self, mode="human", close = False):
+        
+        screen = np.ones(shape=( self.screen_height+1,self.screen_width+1, 3), dtype=np.uint8)
+        border_color = (0, 0,255)
+        
+        screen = cv2.rectangle(screen, (0,0),  (self.screen_width,self.screen_height), (255,255,255),-1)
+        
+        screen =cv2.line(screen, (0,0), (self.screen_width,0), border_color)
+        screen =cv2.line(screen, (0,self.screen_height), (self.screen_width,self.screen_height), border_color)
+        
+        screen =cv2.line(screen, (0,0), (0,self.screen_height), border_color)
+        screen =cv2.line(screen, (self.screen_width,0), (self.screen_width,self.screen_height), border_color)
+        
+        screen = cv2.circle(screen, center=(self.ball_pos[0], self.ball_pos[1]), radius=1, color=(255,255,0),thickness=-1)
+        screen = cv2.rectangle(screen, self.paddle_pos, (self.paddle_pos[0] + self.paddle_width, self.paddle_pos[1] + self.paddle_height), (0,255,0),-1)
+            
         if(mode=="human"):
             
             cv2.namedWindow("bounce", cv2.WINDOW_NORMAL)
-            screen = np.ones(shape=( self.screen_height+1,self.screen_width+1, 3))
-            
-            border_color = (0, 0,255)
-            screen =cv2.line(screen, (0,0), (self.screen_width,0), border_color)
-            screen =cv2.line(screen, (0,self.screen_height), (self.screen_width,self.screen_height), border_color)
-            
-            screen =cv2.line(screen, (0,0), (0,self.screen_width), border_color)
-            screen =cv2.line(screen, (self.screen_width,0), (self.screen_width,self.screen_height), border_color)
-            
-            screen = cv2.circle(screen, center=(self.ball_pos[0], self.ball_pos[1]), radius=1, color=(255,255,0),thickness=-1)
-            screen = cv2.rectangle(screen, self.paddle_pos, (self.paddle_pos[0] + self.paddle_width, self.paddle_pos[1] + self.paddle_height), (0,255,0),-1)
-            
             cv2.imshow("bounce", screen)
             cv2.waitKey(5)
+            
+        elif(mode=="video_record"):
+            screen = cv2.resize(screen, dsize=(screen.shape[1]*10, screen.shape[0]*10), interpolation=cv2.INTER_AREA)
+            self.image_array.append(screen)
+        else:
+            pass
+        
+    def saveVideo(self, videoName):
+        shape = self.image_array[0].shape
+        
+        vw = cv2.VideoWriter(videoName, -1,  60, (shape[1], shape[0]) )
+
+        for i in range(len(self.image_array)):
+            image = self.image_array[i].astype('uint8')
+            # cv2.imshow("bounce", image)
+            cv2.waitKey(5)
+            vw.write(image)    
+            
+        vw.release()
+        pass

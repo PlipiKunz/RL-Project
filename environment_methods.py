@@ -1,19 +1,18 @@
 
+import os
 import gym
 from gym.core import Env
-import environment
+# import BounceEnv
 import numpy as np
 
 import globalVars
 import keyboard
+import BounceEnv
 
 list_of_actions = []
 
-
-
 def initialize_new_game(name, env, agent):
     """We don't want an agents past game influencing its new game, so we add in some dummy data to initialize"""
-    
     env.reset()
     starting_frame = env.step(0)[0]
     
@@ -24,9 +23,9 @@ def initialize_new_game(name, env, agent):
         agent.memory.add_experience(starting_frame, dummy_reward, dummy_action, dummy_done)
 
 def make_env(name, agent):
-    if name == "Bounce":
-        env = environment.BounceEnv()
-    else: 
+    if(name=='Bounce'):
+        env = BounceEnv.BounceEnv()
+    else:
         env = gym.make(name)
         
     return env
@@ -43,6 +42,9 @@ def good_actor_epsilon(env):
     else:
         act =  env.paddle_ball_relation()
         
+    if globalVars.ga_epsilon > globalVars.ga_epsilon_min:
+            globalVars.ga_epsilon -=globalVars.ga_epsilon_decay
+            
     return act
     
 def get_user_action():
@@ -56,7 +58,7 @@ def get_actor_action(env):
     # env.render()
     
     # return good_actor_random(env)
-    return good_actor_epsilon(env)
+    return env.paddle_ball_relation()
     # return good_actor_random(env)
     
 
@@ -106,13 +108,10 @@ def take_step(name, env, agent, score, debug, mode = "computer", learn = True, r
 
             agent.learn(debug)
 
-    #8: If we are trying to debug this then render
-    if debug:
-        env.render()
 
     return (score + next_frames_reward),False, info  #(next_frames_reward), False
 
-def play_episode(name, env, agent, debug = False, iterations = 0, mode = "computer", learn = True, remember = True):
+def play_episode(name, env, agent, debug = False, iterations = 0, mode = "computer", learn = True, remember = True, itters_to_save_video_for=[]):
     initialize_new_game(name, env, agent)
     done = False
     score = 0
@@ -123,14 +122,19 @@ def play_episode(name, env, agent, debug = False, iterations = 0, mode = "comput
     else:
         globalVars.be_random = False
         
-    if globalVars.ga_epsilon > globalVars.ga_epsilon_min:
-            globalVars.ga_epsilon -=globalVars.ga_epsilon_decay
             
             
     print(globalVars.ga_epsilon)
     while True:
         score,done,info  = take_step(name,env,agent,score, debug, mode, learn, remember)
         
+        if iterations in itters_to_save_video_for:
+            env.render('video_record')
+        
         if done:
             break
+        
+    if iterations in itters_to_save_video_for:
+            env.saveVideo(os.path.join(globalVars.video_path, f"video_{iterations}.mp4"))
+            
     return score, info 
