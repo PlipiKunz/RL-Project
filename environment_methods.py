@@ -58,7 +58,7 @@ def get_actor_action(env):
     # env.render()
     
     # return good_actor_random(env)
-    return env.paddle_ball_relation()
+    return good_actor_epsilon(env)
     # return good_actor_random(env)
     
 

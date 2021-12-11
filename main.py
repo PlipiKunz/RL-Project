@@ -26,14 +26,14 @@ env.reset()
 
 for i in range(2_001):
     print('\nEpisode: ' + str(i))
-    environment_methods.play_episode(name, env, agent, False, i, "human", False, True,[0])
+    environment_methods.play_episode(name, env, agent, False, i, "human", False, True)
     env.reset()
 
 for i in range(2_001):
     timesteps = agent.total_timesteps
     start_time = time.time()
 
-    score , info = environment_methods.play_episode(name, env, agent, False, i, "computer",True, False, [1000,2000])
+    score , info = environment_methods.play_episode(name, env, agent, False, i, "computer",True, True, [500, 1000,2000])
     
     scores.append(score)
 
